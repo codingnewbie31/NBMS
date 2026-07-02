@@ -22,6 +22,7 @@ export default function Navbar() {
           <Link to="/production" className="hover:text-blue-200 transition">Production</Link>
           <Link to="/expenses" className="hover:text-blue-200 transition">Expenses</Link>
           <Link to="/reports" className="hover:text-blue-200 transition">Reports</Link>
+          <Link to="/raw-materials" className="hover:text-blue-200 transition">Materials</Link>
         </div>
       </div>
       <div className="flex items-center gap-4">

@@ -9,6 +9,7 @@ import NewOrderPage from './pages/NewOrderPage';
 import ExpensesPage from './pages/ExpensesPage';
 import ProductionPage from './pages/ProductionPage';
 import ReportsPage from './pages/ReportsPage';
+import RawMaterialsPage from './pages/RawMaterialsPage';
 
 function App() {
   const { user } = useAuth();
@@ -28,6 +29,7 @@ function App() {
       <Route path="/production" element={<ProtectedRoute><ProductionPage /></ProtectedRoute>} />
       <Route path="/expenses" element={<ProtectedRoute><ExpensesPage /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
+      <Route path="/raw-materials" element={<ProtectedRoute><RawMaterialsPage /></ProtectedRoute>} />
     </Routes>
   );
 }
