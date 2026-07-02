@@ -6,6 +6,7 @@ import ProductsPage from './pages/ProductsPage';
 import CustomersPage from './pages/CustomersPage';
 import OrdersPage from './pages/OrdersPage';
 import NewOrderPage from './pages/NewOrderPage';
+import ExpensesPage from './pages/ExpensesPage';
 
 function App() {
   const { user } = useAuth();
@@ -23,7 +24,7 @@ function App() {
       <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
       <Route path="/orders/new" element={<ProtectedRoute><NewOrderPage /></ProtectedRoute>} />
       <Route path="/production" element={<ProtectedRoute><div className="p-8">Production page coming soon</div></ProtectedRoute>} />
-      <Route path="/expenses" element={<ProtectedRoute><div className="p-8">Expenses page coming soon</div></ProtectedRoute>} />
+      <Route path="/expenses" element={<ProtectedRoute><ExpensesPage /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><div className="p-8">Reports page coming soon</div></ProtectedRoute>} />
     </Routes>
   );
