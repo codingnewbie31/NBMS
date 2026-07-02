@@ -55,4 +55,44 @@ router.get("/summary", authMiddleware, async (req, res) => {
   }
 });
 
+router.get('/dashboard', authMiddleware, async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Today's revenue
+    const todayOrders = await Order.find({
+      createdAt: { $gte: today, $lte: todayEnd }
+    });
+    const todayRevenue = todayOrders.reduce((sum, o) => sum + o.grandTotal, 0);
+
+    // Total receivables (all customers with outstanding balance)
+    const Customer = require('../models/Customer');
+    const customers = await Customer.find({ currentBalance: { $gt: 0 } });
+    const totalReceivables = customers.reduce((sum, c) => sum + c.currentBalance, 0);
+
+    // Low stock products
+    const Product = require('../models/Product');
+    const products = await Product.find();
+    const lowStockProducts = products.filter(p => p.stockBottles <= p.lowStockLimit);
+
+    // Recent 5 orders
+    const recentOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate('customerId', 'businessName');
+
+    res.json({
+      todayRevenue,
+      totalReceivables,
+      lowStockProducts,
+      recentOrders
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
