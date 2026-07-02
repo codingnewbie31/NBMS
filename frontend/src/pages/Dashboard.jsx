@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import Navbar from '../components/Navbar';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -28,18 +29,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
-      <nav className="bg-blue-700 text-white px-6 py-4 flex justify-between items-center shadow">
-        <h1 className="text-xl font-bold">Nashat Beverages ERP</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-blue-200 text-sm">Welcome, {user?.name}</span>
-          <button
-            onClick={logout}
-            className="bg-blue-900 px-3 py-1 rounded text-sm hover:bg-blue-800 transition"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-6xl mx-auto p-6">
         {/* Key Metrics Row */}

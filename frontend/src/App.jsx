@@ -6,10 +6,20 @@ import Dashboard from './pages/Dashboard';
 function App() {
   const { user } = useAuth();
 
+  const ProtectedRoute = ({ children }) => {
+    return user ? children : <Navigate to="/login" />;
+  };
+
   return (
     <Routes>
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
-      <Route path="/" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+      <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/products" element={<ProtectedRoute><div className="p-8">Products page coming soon</div></ProtectedRoute>} />
+      <Route path="/customers" element={<ProtectedRoute><div className="p-8">Customers page coming soon</div></ProtectedRoute>} />
+      <Route path="/orders" element={<ProtectedRoute><div className="p-8">Orders page coming soon</div></ProtectedRoute>} />
+      <Route path="/production" element={<ProtectedRoute><div className="p-8">Production page coming soon</div></ProtectedRoute>} />
+      <Route path="/expenses" element={<ProtectedRoute><div className="p-8">Expenses page coming soon</div></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><div className="p-8">Reports page coming soon</div></ProtectedRoute>} />
     </Routes>
   );
 }
