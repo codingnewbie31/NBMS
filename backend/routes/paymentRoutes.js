@@ -31,7 +31,8 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const payments = await Payment.find()
       .populate('customerId')
-      .populate('orderId');
+      .populate('orderId')
+      .populate('recordedBy', 'name');
     res.json(payments);
   } catch (err) {
     res.status(500).json({ error: err.message });
