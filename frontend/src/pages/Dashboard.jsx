@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
-import Navbar from '../components/Navbar';
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
+import Navbar from "../components/Navbar";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -9,22 +9,24 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/reports/dashboard')
-      .then(res => {
+    api
+      .get("/reports/dashboard")
+      .then((res) => {
         setData(res.data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <p className="text-gray-500 text-lg">Loading dashboard...</p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Loading dashboard...</p>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -60,14 +62,31 @@ export default function Dashboard() {
             <h2 className="font-semibold text-gray-700 mb-3">
               ⚠️ Low Stock Warnings
             </h2>
-            {data?.lowStockProducts?.length === 0 ? (
-              <p className="text-gray-400 text-sm">All products are sufficiently stocked</p>
+            {data?.lowStockProducts?.length === 0 &&
+            data?.lowStockMaterials?.length === 0 ? (
+              <p className="text-gray-400 text-sm">
+                All stocks are sufficiently stocked
+              </p>
             ) : (
               <ul className="space-y-2">
-                {data?.lowStockProducts?.map(p => (
-                  <li key={p._id} className="text-sm text-red-600 flex justify-between">
-                    <span>{p.name}</span>
+                {data?.lowStockProducts?.map((p) => (
+                  <li
+                    key={p._id}
+                    className="text-sm text-red-600 flex justify-between"
+                  >
+                    <span>📦 {p.name}</span>
                     <span>{p.stockBottles} bottles remaining</span>
+                  </li>
+                ))}
+                {data?.lowStockMaterials?.map((m) => (
+                  <li
+                    key={m._id}
+                    className="text-sm text-orange-600 flex justify-between"
+                  >
+                    <span>⚗️ {m.materialName}</span>
+                    <span>
+                      {m.currentQuantity} {m.unitType} remaining
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -81,8 +100,11 @@ export default function Dashboard() {
               <p className="text-gray-400 text-sm">No orders yet</p>
             ) : (
               <ul className="space-y-2">
-                {data?.recentOrders?.map(order => (
-                  <li key={order._id} className="flex justify-between text-sm border-b pb-2">
+                {data?.recentOrders?.map((order) => (
+                  <li
+                    key={order._id}
+                    className="flex justify-between text-sm border-b pb-2"
+                  >
                     <div>
                       <p className="font-medium text-gray-700">
                         {order.customerId?.businessName}
@@ -93,8 +115,16 @@ export default function Dashboard() {
                       <p className="font-semibold text-blue-700">
                         Rs. {order.grandTotal?.toLocaleString()}
                       </p>
-                      <p className={order.outstandingBalance > 0 ? 'text-red-500 text-xs' : 'text-green-500 text-xs'}>
-                        {order.outstandingBalance > 0 ? `Rs. ${order.outstandingBalance} due` : 'Paid'}
+                      <p
+                        className={
+                          order.outstandingBalance > 0
+                            ? "text-red-500 text-xs"
+                            : "text-green-500 text-xs"
+                        }
+                      >
+                        {order.outstandingBalance > 0
+                          ? `Rs. ${order.outstandingBalance} due`
+                          : "Paid"}
                       </p>
                     </div>
                   </li>
