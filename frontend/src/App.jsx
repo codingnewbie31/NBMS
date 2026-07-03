@@ -1,37 +1,78 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
-import Dashboard from './pages/Dashboard';
-import ProductsPage from './pages/ProductsPage';
-import CustomersPage from './pages/CustomersPage';
-import OrdersPage from './pages/OrdersPage';
-import NewOrderPage from './pages/NewOrderPage';
-import ExpensesPage from './pages/ExpensesPage';
-import ProductionPage from './pages/ProductionPage';
-import ReportsPage from './pages/ReportsPage';
-import RawMaterialsPage from './pages/RawMaterialsPage';
+import React from "react";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
-function App() {
-  const { user } = useAuth();
+import AppLayout from "./layout/AppLayout";
 
-  const ProtectedRoute = ({ children }) => {
-    return user ? children : <Navigate to="/login" />;
+// Pages
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import OrdersPage from "./pages/OrdersPage";
+import NewOrderPage from "./pages/NewOrderPage";
+import CustomersPage from "./pages/CustomersPage";
+import ProductsPage from "./pages/ProductsPage";
+import ProductionPage from "./pages/ProductionPage";
+import ExpensesPage from "./pages/ExpensesPage";
+
+export default function App() {
+  // Authentication State
+  const { isAuthenticated } = useAuth();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Page Title Mapping
+  const getPageTitle = (pathname) => {
+    switch (pathname) {
+      case "/dashboard":
+        return "Dashboard";
+      case "/orders":
+        return "Orders";
+      case "/orders/new":
+        return "New Order";
+      case "/customers":
+        return "Customers";
+      case "/products":
+        return "Products";
+      case "/production":
+        return "Production";
+      case "/expenses":
+        return "Expenses";
+      default:
+        return "Dashboard";
+    }
   };
 
+  // Login Routes
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  // Protected Routes
   return (
-    <Routes>
-      <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
-      <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/products" element={<ProtectedRoute><ProductsPage /></ProtectedRoute>} />
-      <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
-      <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
-      <Route path="/orders/new" element={<ProtectedRoute><NewOrderPage /></ProtectedRoute>} />
-      <Route path="/production" element={<ProtectedRoute><ProductionPage /></ProtectedRoute>} />
-      <Route path="/expenses" element={<ProtectedRoute><ExpensesPage /></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
-      <Route path="/raw-materials" element={<ProtectedRoute><RawMaterialsPage /></ProtectedRoute>} />
-    </Routes>
+    <AppLayout
+      currentPath={location.pathname}
+      currentTitle={getPageTitle(location.pathname)}
+      onNavigate={(path) => navigate(path)}
+    >
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/new" element={<NewOrderPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/production" element={<ProductionPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
+
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </AppLayout>
   );
 }
-
-export default App;

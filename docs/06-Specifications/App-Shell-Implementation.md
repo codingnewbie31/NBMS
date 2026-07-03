@@ -87,6 +87,12 @@ System
 - Settings
 - Logout
 
+## Sidebar Requirements
+
+- Use Lucide React icons.
+- Store navigation items in a separate configuration file (e.g., `src/config/navigation.js`).
+- Highlight the active page.
+- Organize navigation into logical groups.
 ---
 
 # Top Bar
@@ -118,7 +124,9 @@ The page should no longer import its own Navbar.
 - Reusable layout
 - Desktop-first
 - Easy future mobile support
-
+- Use Tailwind CSS v4.
+- Build reusable components.
+- Prepare the layout for future mobile support.
 ---
 
 # Acceptance Criteria
