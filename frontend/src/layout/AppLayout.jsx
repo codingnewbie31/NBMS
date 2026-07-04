@@ -1,29 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 import PageContainer from './PageContainer';
 
 export default function AppLayout({ children, currentTitle }) {
+  // Sidebar collapse state lifted here so content spacing can react to it
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     // Flex root template preventing horizontal and vertical viewport shifts
     <div className="min-h-screen w-full bg-slate-50 text-slate-900 font-sans antialiased">
-      
-      {/* Structural layout column: Sidebar pinning layer */}
-      <Sidebar />
+      {/* Sticky sidebar, now controlled from this layout */}
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
-      {/* Main computational panel rendering frame */}
-      <div className="pl-64 flex flex-col min-h-screen">
-        
-        {/* Upper persistent workspace controls container */}
+      {/* Main panel offset matches the sidebar's current width, animated in step */}
+      <div
+        className={`flex min-h-screen flex-col transition-[padding-left] duration-300 ease-in-out ${
+          collapsed ? 'pl-20' : 'pl-64'
+        }`}
+      >
+        {/* Sticky top bar stays pinned while content scrolls */}
         <TopBar currentTitle={currentTitle} />
 
-        {/* Dynamic routing presentation canvas viewport layout */}
-        <main className="flex-1 overflow-y-auto">
-          <PageContainer>
-            {children}
-          </PageContainer>
+        {/* Scrollable routing canvas, smooth-scrolls on anchor/programmatic jumps */}
+        <main className="flex-1 overflow-y-auto scroll-smooth">
+          <PageContainer>{children}</PageContainer>
         </main>
-
       </div>
     </div>
   );
