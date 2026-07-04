@@ -11,7 +11,7 @@ import {
   Settings 
 } from 'lucide-react';
 
-// Navigation configuration grouped by section boundaries (Logout removed)
+// Central configuration defining navigation structure and icons
 export const navigationConfig = [
   {
     group: "Overview",
