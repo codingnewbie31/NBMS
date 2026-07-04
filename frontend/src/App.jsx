@@ -46,6 +46,10 @@ export default function App() {
         return "Production";
       case "/expenses":
         return "Expenses";
+      case"raw-materials":
+        return"/raw-materials";
+      case"reports":
+        return"/reports";
       default:
         return "Dashboard";
     }

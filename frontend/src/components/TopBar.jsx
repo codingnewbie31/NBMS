@@ -1,107 +1,190 @@
-import React, { useState } from 'react';
-import { Search, Bell, ChevronDown, User, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+// src/components/TopBar.jsx
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Search,
+  Bell,
+  ChevronDown,
+  User,
+  Settings,
+  LogOut,
+  Menu,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
-export default function TopBar({ currentTitle }) {
+export default function TopBar({ currentTitle, onMenuClick }) {
   const { user, logout } = useAuth();
-  // Controls the user dropdown's open/closed state
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const menuRef = useRef(null);
+  const notificationRef = useRef(null);
 
-  // Initials fallback for the avatar chip when no photo exists
-  const initials = (user?.name || user?.username || 'U').trim().charAt(0).toUpperCase();
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+        setNotificationsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const initials = (user?.name || user?.username || "U")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
 
   return (
-    // 64px enterprise header: white surface, bottom border only, soft shadow
-    <header className="flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
-      {/* Left: page title + breadcrumb trail */}
-      <div className="min-w-0">
-        <h1 className="truncate text-lg font-bold text-slate-900 tracking-tight">{currentTitle}</h1>
-        <p className="truncate text-xs font-medium text-slate-400">
-          Home <span className="mx-1 text-slate-300">/</span> {currentTitle}
-        </p>
+    <header className="relative z-40 flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-sm px-4 sm:px-6">
+      {/* Left: Mobile menu + page title */}
+      <div className="flex items-center gap-3 min-w-0">
+        {/* Mobile menu button */}
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors lg:hidden"
+          aria-label="Toggle navigation"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-bold text-slate-900 tracking-tight">
+            {currentTitle}
+          </h1>
+          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+            <span>Home</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-emerald-600">{currentTitle}</span>
+          </div>
+        </div>
       </div>
 
-      {/* Right: search, notifications, user block */}
-      <div className="flex items-center gap-4">
-        {/* Search input, desktop only */}
-        <div className="relative hidden w-64 md:block">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+      {/* Right: Actions */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Search */}
+        <div className="relative hidden sm:block">
+          <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <Search className="h-4 w-4 text-slate-400" aria-hidden="true" />
           </span>
           <input
             type="text"
             placeholder="Search..."
-            className="w-full rounded-full border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+            className="w-48 lg:w-64 rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 outline-none transition-all focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100 focus:w-56 lg:focus:w-72"
           />
         </div>
 
-        {/* Notification bell */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
-        >
-          <Bell className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
-        </button>
+        {/* Notifications */}
+        <div className="relative" ref={notificationRef}>
+          <button
+            type="button"
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            aria-label="Notifications"
+            className="relative rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-all"
+          >
+            <Bell className="h-5 w-5" aria-hidden="true" />
+            <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+            </span>
+          </button>
 
-        {/* User block: avatar, name, role, dropdown toggle */}
-        <div className="relative border-l border-slate-200 pl-4">
+          {/* Notifications dropdown */}
+          {notificationsOpen && (
+            <div className="absolute right-0 top-12 z-50 w-72 rounded-xl border border-slate-200 bg-white py-2 shadow-lg shadow-slate-200/50">
+              <div className="px-4 py-2 border-b border-slate-100">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Notifications
+                </p>
+              </div>
+              <div className="py-8 text-center">
+                <Bell className="mx-auto h-8 w-8 text-slate-300" />
+                <p className="mt-2 text-sm text-slate-400">No new notifications</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* User Menu */}
+        <div className="relative" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-haspopup="menu"
             aria-expanded={menuOpen}
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-2.5 rounded-xl p-1.5 pr-2 hover:bg-slate-100 transition-all"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-emerald-400">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-emerald-600 text-xs font-bold text-white shadow-sm shadow-emerald-200">
               {initials}
             </span>
             <div className="hidden sm:block text-left">
               <p className="text-sm font-semibold leading-none text-slate-800">
-                {user?.name || user?.username || 'Operator'}
+                {user?.name || user?.username || "Operator"}
               </p>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-wide leading-none text-slate-400">
-                {user?.role || 'System Node'}
+              <p className="mt-1 text-[10px] font-medium uppercase tracking-wide leading-none text-slate-400">
+                {user?.role || "Operator"}
               </p>
             </div>
-            <ChevronDown className="h-4 w-4 text-slate-400" aria-hidden="true" />
+            <ChevronDown
+              className={`hidden sm:block h-4 w-4 text-slate-400 transition-transform ${
+                menuOpen ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+            />
           </button>
 
-          {/* Dropdown menu: profile/settings placeholders + working logout */}
+          {/* Dropdown */}
           {menuOpen && (
-            <div className="absolute right-0 top-12 z-50 w-48 rounded-md border border-slate-200 bg-white py-1 shadow-lg ring-1 ring-black/5">
-              <button
-                type="button"
-                disabled
-                className="flex w-full items-center justify-between px-4 py-2 text-xs font-medium text-slate-400 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <User className="h-3.5 w-3.5" aria-hidden="true" />
-                  Profile
-                </span>
-                <span className="text-[9px] uppercase tracking-wide">Soon</span>
-              </button>
-              <button
-                type="button"
-                disabled
-                className="flex w-full items-center justify-between px-4 py-2 text-xs font-medium text-slate-400 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <Settings className="h-3.5 w-3.5" aria-hidden="true" />
-                  Settings
-                </span>
-                <span className="text-[9px] uppercase tracking-wide">Soon</span>
-              </button>
-              <div className="my-1 border-t border-slate-100" />
-              <button
-                type="button"
-                onClick={logout}
-                className="flex w-full items-center gap-2 px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-              >
-                <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-                Log Out
-              </button>
+            <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-slate-200 bg-white py-2 shadow-lg shadow-slate-200/50">
+              {/* User info */}
+              <div className="px-4 py-3 border-b border-slate-100">
+                <p className="text-sm font-semibold text-slate-800">
+                  {user?.name || user?.username || "Operator"}
+                </p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {user?.email || user?.phoneNumber || ""}
+                </p>
+              </div>
+
+              {/* Menu items */}
+              <div className="py-1">
+                <button
+                  type="button"
+                  disabled
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-slate-400 cursor-not-allowed"
+                >
+                  <User className="h-4 w-4" aria-hidden="true" />
+                  <span className="flex-1 text-left">Profile</span>
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                    Soon
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  disabled
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-slate-400 cursor-not-allowed"
+                >
+                  <Settings className="h-4 w-4" aria-hidden="true" />
+                  <span className="flex-1 text-left">Settings</span>
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-slate-300">
+                    Soon
+                  </span>
+                </button>
+              </div>
+
+              <div className="border-t border-slate-100 pt-1">
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  Log Out
+                </button>
+              </div>
             </div>
           )}
         </div>
