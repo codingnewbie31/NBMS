@@ -1,10 +1,28 @@
+// src/pages/NewOrderPage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import {
+  Plus,
+  X,
+  ShoppingCart,
+  User,
+  Package,
+  DollarSign,
+  AlertTriangle,
+  Receipt,
+  Building2,
+  Phone,
+  MapPin,
+} from "lucide-react";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import { Button, Badge, Card } from "../components/ui";
 
 export default function NewOrderPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Data state
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -21,6 +39,7 @@ export default function NewOrderPage() {
     area: "",
   });
 
+  // Preserved API calls
   useEffect(() => {
     api.get("/customers").then((res) => setCustomers(res.data));
     api.get("/products").then((res) => setProducts(res.data));
@@ -29,6 +48,7 @@ export default function NewOrderPage() {
       .then((res) => setOrderNumber(res.data.orderNumber));
   }, []);
 
+  // Customer handlers - preserved business logic
   const handleCustomerChange = (e) => {
     const customer = customers.find((c) => c._id === e.target.value);
     setSelectedCustomer(customer || null);
@@ -61,7 +81,7 @@ export default function NewOrderPage() {
 
   const grandTotal = items.reduce(
     (sum, item) => sum + calculateSubtotal(item),
-    0,
+    0
   );
   const outstandingBalance = grandTotal - Number(amountPaid);
 
@@ -115,96 +135,91 @@ export default function NewOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => navigate("/orders")}
-            className="text-gray-500 hover:text-gray-700 text-sm"
-          >
-            ← Back to Orders
-          </button>
-          <h2 className="text-xl font-bold text-gray-700">New Order</h2>
+    <div className="flex flex-col gap-6">
+      {/* Back button and title */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => navigate("/orders")}
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
+        >
+          ← Back to Orders
+        </button>
+        <h1 className="text-xl font-bold text-slate-900">New Order</h1>
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* order number field */}
-          <div className="bg-white rounded-xl shadow p-5">
-            <label className="block text-sm text-gray-600 mb-1">
-              Order Number{" "}
-              <span className="text-gray-400 text-xs">
-                (auto-suggested, editable)
-              </span>
-            </label>
-            <input
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          {/* Customer Selection */}
-          <div className="bg-white rounded-xl shadow p-5">
-            <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Customer
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Order Number */}
+        <Card>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
+              <Receipt className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div className="flex-1">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Order Number
+                <span className="ml-1 font-normal text-slate-400">(auto-suggested)</span>
               </label>
+              <input
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-mono font-semibold text-slate-700 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                required
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Customer Selection */}
+        <Card title="Customer" icon={User}>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500">Select or add a customer</p>
               <button
                 type="button"
                 onClick={() => setShowNewCustomer(!showNewCustomer)}
-                className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
               >
-                {showNewCustomer ? "— Cancel" : "+ Add New Customer"}
+                {showNewCustomer ? "Cancel" : "+ Add New Customer"}
               </button>
             </div>
 
             {/* Inline new customer form */}
             {showNewCustomer && (
-              <div className="bg-gray-50 rounded-lg p-4 mb-3 space-y-3">
-                <p className="text-xs text-gray-500 font-medium">
+              <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-emerald-700">
                   New Customer Details
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input
                     placeholder="Customer Name"
                     value={newCustomer.customerName}
                     onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        customerName: e.target.value,
-                      })
+                      setNewCustomer({ ...newCustomer, customerName: e.target.value })
                     }
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
                   <input
                     placeholder="Business Name"
                     value={newCustomer.businessName}
                     onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        businessName: e.target.value,
-                      })
+                      setNewCustomer({ ...newCustomer, businessName: e.target.value })
                     }
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
                   <input
                     placeholder="Phone Number"
                     value={newCustomer.phoneNumber}
                     onChange={(e) =>
-                      setNewCustomer({
-                        ...newCustomer,
-                        phoneNumber: e.target.value,
-                      })
+                      setNewCustomer({ ...newCustomer, phoneNumber: e.target.value })
                     }
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
                   <input
                     placeholder="Area (optional)"
@@ -212,25 +227,28 @@ export default function NewOrderPage() {
                     onChange={(e) =>
                       setNewCustomer({ ...newCustomer, area: e.target.value })
                     }
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  icon={Plus}
+                  size="sm"
                   onClick={handleAddNewCustomer}
-                  className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition"
+                  className="mt-3"
                 >
                   Save & Select Customer
-                </button>
+                </Button>
               </div>
             )}
 
-            {/* Existing customer dropdown */}
+            {/* Customer dropdown */}
             {!showNewCustomer && (
               <select
                 onChange={handleCustomerChange}
                 value={selectedCustomer?._id || ""}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                 required
               >
                 <option value="">-- Select a customer --</option>
@@ -242,163 +260,187 @@ export default function NewOrderPage() {
               </select>
             )}
 
-            {/* Selected customer confirmation */}
+            {/* Selected customer display */}
             {selectedCustomer && !showNewCustomer && (
-              <div className="mt-2 text-sm text-green-600 font-medium">
-                ✓ {selectedCustomer.businessName} selected
+              <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
+                    <Building2 className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-slate-800">
+                      {selectedCustomer.businessName}
+                    </p>
+                    <div className="mt-1 flex flex-wrap gap-3 text-xs text-slate-500">
+                      <span className="inline-flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        {selectedCustomer.customerName}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        {selectedCustomer.phoneNumber}
+                      </span>
+                      {selectedCustomer.area && (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {selectedCustomer.area}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Outstanding balance warning */}
             {selectedCustomer?.currentBalance > 0 && (
-              <div className="mt-3 bg-orange-50 border border-orange-200 text-orange-700 px-4 py-2 rounded text-sm">
-                ⚠️ This customer has an outstanding balance of Rs.{" "}
-                {selectedCustomer.currentBalance.toLocaleString()}
+              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                Outstanding balance: Rs. {selectedCustomer.currentBalance.toLocaleString()}
               </div>
             )}
           </div>
+        </Card>
 
-          {/* Product Line Items */}
-          <div className="bg-white rounded-xl shadow p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Order Items
-            </h3>
-            <div className="space-y-3">
-              {items.map((item, index) => {
-                const product = getProduct(item.productId);
-                const subtotal = calculateSubtotal(item);
-                return (
-                  <div
-                    key={index}
-                    className="grid grid-cols-12 gap-2 items-end"
-                  >
-                    <div className="col-span-5">
-                      {index === 0 && (
-                        <label className="block text-xs text-gray-500 mb-1">
-                          Product
-                        </label>
-                      )}
-                      <select
-                        value={item.productId}
-                        onChange={(e) =>
-                          handleItemChange(index, "productId", e.target.value)
-                        }
-                        className="w-full border rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        <option value="">-- Select product --</option>
-                        {products.map((p) => (
-                          <option key={p._id} value={p._id}>
-                            {p.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-span-3">
-                      {index === 0 && (
-                        <label className="block text-xs text-gray-500 mb-1">
-                          Qty (Bottles)
-                        </label>
-                      )}
-                      <input
-                        type="number"
-                        value={item.qtyBottles}
-                        onChange={(e) =>
-                          handleItemChange(index, "qtyBottles", e.target.value)
-                        }
-                        placeholder="0"
-                        className="w-full border rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
-                    <div className="col-span-3">
-                      {index === 0 && (
-                        <label className="block text-xs text-gray-500 mb-1">
-                          Subtotal
-                        </label>
-                      )}
-                      <div className="border border-gray-100 bg-gray-50 rounded-lg px-2 py-2 text-sm text-gray-600">
-                        Rs. {subtotal.toFixed(0)}
-                        {product && (
-                          <span className="text-xs text-gray-400 block">
-                            {item.qtyBottles
-                              ? Math.floor(
-                                  Number(item.qtyBottles) /
-                                    product.caseCapacity,
-                                )
-                              : 0}{" "}
-                            cases +{" "}
-                            {item.qtyBottles
-                              ? Number(item.qtyBottles) % product.caseCapacity
-                              : 0}{" "}
-                            bottles
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-span-1 flex justify-center">
-                      {items.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeItem(index)}
-                          className="text-red-400 hover:text-red-600 text-lg font-bold"
-                        >
-                          ×
-                        </button>
+        {/* Order Items */}
+        <Card title="Order Items" icon={Package}>
+          <div className="space-y-3">
+            {items.map((item, index) => {
+              const product = getProduct(item.productId);
+              const subtotal = calculateSubtotal(item);
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-12 gap-3 items-end rounded-lg bg-slate-50 p-4"
+                >
+                  <div className="col-span-5 sm:col-span-5">
+                    {index === 0 && (
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Product
+                      </label>
+                    )}
+                    <select
+                      value={item.productId}
+                      onChange={(e) =>
+                        handleItemChange(index, "productId", e.target.value)
+                      }
+                      className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2.5 text-sm focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                      required
+                    >
+                      <option value="">-- Select product --</option>
+                      {products.map((p) => (
+                        <option key={p._id} value={p._id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-3 sm:col-span-3">
+                    {index === 0 && (
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Qty (Bottles)
+                      </label>
+                    )}
+                    <input
+                      type="number"
+                      value={item.qtyBottles}
+                      onChange={(e) =>
+                        handleItemChange(index, "qtyBottles", e.target.value)
+                      }
+                      placeholder="0"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2.5 text-sm focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                      required
+                    />
+                  </div>
+                  <div className="col-span-3 sm:col-span-3">
+                    {index === 0 && (
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                        Subtotal
+                      </label>
+                    )}
+                    <div className="rounded-lg border border-slate-100 bg-white px-2 py-2.5 text-sm font-medium text-slate-700">
+                      Rs. {subtotal.toFixed(0)}
+                      {product && item.qtyBottles && (
+                        <span className="block text-xs font-normal text-slate-400">
+                          {Math.floor(Number(item.qtyBottles) / product.caseCapacity)} cases +{" "}
+                          {Number(item.qtyBottles) % product.caseCapacity} bottles
+                        </span>
                       )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            <button
-              type="button"
-              onClick={addItem}
-              className="mt-3 text-blue-600 hover:text-blue-800 text-sm font-medium"
-            >
-              + Add Another Product
-            </button>
-          </div>
-          {/* Financial Summary */}
-          <div className="bg-white rounded-xl shadow p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Payment</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Grand Total</span>
-                <span className="font-semibold text-gray-700">
-                  Rs. {grandTotal.toFixed(0)}
-                </span>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Amount Paid Now
-                </label>
-                <input
-                  type="number"
-                  value={amountPaid}
-                  onChange={(e) => setAmountPaid(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex justify-between text-sm border-t pt-3">
-                <span className="text-gray-500">Outstanding Balance</span>
-                <span
-                  className={`font-semibold ${outstandingBalance > 0 ? "text-red-500" : "text-green-500"}`}
-                >
-                  Rs. {outstandingBalance.toFixed(0)}
-                </span>
-              </div>
-            </div>
+                  <div className="col-span-1 flex justify-center">
+                    {items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeItem(index)}
+                        className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <button
-            type="submit"
-            disabled={submitting || !selectedCustomer}
-            className="w-full bg-blue-700 text-white py-3 rounded-xl font-semibold hover:bg-blue-800 transition disabled:opacity-50"
+            type="button"
+            onClick={addItem}
+            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700"
           >
-            {submitting ? "Creating Order..." : "Confirm Order"}
+            <Plus className="h-4 w-4" />
+            Add Another Product
           </button>
-        </form>
-      </div>
+        </Card>
+
+        {/* Payment Summary */}
+        <Card title="Payment" icon={DollarSign}>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-lg bg-slate-50 p-4">
+              <span className="text-sm font-medium text-slate-500">Grand Total</span>
+              <span className="text-xl font-bold text-slate-900">
+                Rs. {grandTotal.toFixed(0)}
+              </span>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Amount Paid Now
+              </label>
+              <input
+                type="number"
+                value={amountPaid}
+                onChange={(e) => setAmountPaid(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+              />
+            </div>
+            <div className="flex items-center justify-between border-t border-slate-200 pt-4">
+              <span className="text-sm font-medium text-slate-500">
+                Outstanding Balance
+              </span>
+              <span
+                className={`text-lg font-bold ${
+                  outstandingBalance > 0 ? "text-amber-600" : "text-emerald-600"
+                }`}
+              >
+                Rs. {outstandingBalance.toFixed(0)}
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          loading={submitting}
+          disabled={submitting || !selectedCustomer}
+          icon={ShoppingCart}
+        >
+          {submitting ? "Creating Order..." : "Confirm Order"}
+        </Button>
+      </form>
     </div>
   );
 }
