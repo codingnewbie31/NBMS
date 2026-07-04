@@ -1,51 +1,80 @@
-import { 
-  LayoutDashboard, 
-  Boxes, 
-  Factory, 
-  ClipboardList, 
-  Truck, 
-  Users, 
-  UserCheck, 
-  BarChart3, 
-  CreditCard, 
-  Settings 
-} from 'lucide-react';
+import {
+  LayoutDashboard,
+  Package,
+  Factory,
+  ClipboardList,
+  Users,
+  Boxes,
+  BarChart3,
+  CreditCard,
+} from "lucide-react";
 
-// Central configuration defining navigation structure and icons
 export const navigationConfig = [
   {
     group: "Overview",
     items: [
-      { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard }
-    ]
+      {
+        name: "Dashboard",
+        path: "/dashboard",
+        icon: LayoutDashboard,
+      },
+    ],
   },
+
   {
     group: "Operations",
     items: [
-      { name: "Inventory", path: "/inventory", icon: Boxes },
-      { name: "Production", path: "/production", icon: Factory },
-      { name: "Orders", path: "/orders", icon: ClipboardList },
-      { name: "Deliveries", path: "/deliveries", icon: Truck }
-    ]
+      {
+        name: "Orders",
+        path: "/orders",
+        icon: ClipboardList,
+      },
+
+      {
+        name: "Products",
+        path: "/products",
+        icon: Package,
+      },
+
+      {
+        name: "Raw Materials",
+        path: "/raw-materials",
+        icon: Boxes,
+      },
+
+      {
+        name: "Production",
+        path: "/production",
+        icon: Factory,
+      },
+    ],
   },
+
   {
     group: "Management",
     items: [
-      { name: "Customers", path: "/customers", icon: Users },
-      { name: "Employees", path: "/employees", icon: UserCheck }
-    ]
+      {
+        name: "Customers",
+        path: "/customers",
+        icon: Users,
+      },
+    ],
   },
+
   {
     group: "Business",
     items: [
-      { name: "Reports", path: "/reports", icon: BarChart3 },
-      { name: "Expenses", path: "/expenses", icon: CreditCard }
-    ]
+      {
+        name: "Expenses",
+        path: "/expenses",
+        icon: CreditCard,
+      },
+
+      {
+        name: "Reports",
+        path: "/reports",
+        icon: BarChart3,
+      },
+    ],
   },
-  {
-    group: "System",
-    items: [
-      { name: "Settings", path: "/settings", icon: Settings }
-    ]
-  }
 ];

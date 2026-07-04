@@ -1,5 +1,11 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 import AppLayout from "./layout/AppLayout";
@@ -13,6 +19,8 @@ import CustomersPage from "./pages/CustomersPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductionPage from "./pages/ProductionPage";
 import ExpensesPage from "./pages/ExpensesPage";
+import RawMaterialsPage from "./pages/RawMaterialsPage";
+import ReportsPage from "./pages/ReportsPage";
 
 export default function App() {
   // Authentication State
@@ -68,8 +76,10 @@ export default function App() {
         <Route path="/orders/new" element={<NewOrderPage />} />
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/raw-materials" element={<RawMaterialsPage />} />
         <Route path="/production" element={<ProductionPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
