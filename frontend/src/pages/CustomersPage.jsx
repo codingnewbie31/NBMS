@@ -539,7 +539,7 @@ export default function CustomersPage() {
             icon={UserPlus}
             size="lg"
             onClick={() => setShowForm(true)}
-            className="bg-white text-emerald-700 hover:bg-emerald-50"
+            className="border-white bg-transparent text-white hover:bg-white hover:text-emerald-700 hover:border-white transition-all duration-300 ease-in-out"
           >
             Add Customer
           </Button>

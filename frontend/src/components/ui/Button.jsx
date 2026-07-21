@@ -1,4 +1,3 @@
-import React from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "./cn";
 
@@ -23,7 +22,7 @@ const SIZES = {
   lg: "h-11 px-5 text-sm gap-2",
 };
 
-export default function Button({
+function Button({
   children,
   variant = "primary",
   size = "md",
@@ -67,3 +66,5 @@ export default function Button({
     </button>
   );
 }
+export default Button;
+export { Button };

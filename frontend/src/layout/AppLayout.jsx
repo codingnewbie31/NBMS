@@ -1,11 +1,11 @@
-import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
 import PageContainer from "./PageContainer";
+import { useState } from "react";
 
 export default function AppLayout({ children, currentTitle }) {
   // Sidebar collapse state lifted here so content spacing can react to it
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     // Flex root template preventing horizontal and vertical viewport shifts

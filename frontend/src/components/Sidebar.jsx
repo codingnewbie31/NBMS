@@ -1,5 +1,3 @@
-// src/components/Sidebar.jsx
-import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Droplets, ChevronLeft, ChevronRight } from "lucide-react";
 import { navigationConfig } from "../config/navigation";
@@ -66,11 +64,6 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                       }`}
                     />
                     {!collapsed && <span className="truncate">{item.name}</span>}
-                    
-                    {/* Active indicator dot */}
-                    {isActive && collapsed && (
-                      <span className="absolute right-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    )}
                   </button>
                 );
               })}

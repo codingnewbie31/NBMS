@@ -6,7 +6,7 @@ import {
   PlusCircle,
   Factory,
   Boxes,
-  BarChart3,
+  BarChart3,  
   DollarSign,
   ClipboardList,
   Package,
@@ -14,14 +14,12 @@ import {
   AlertTriangle,
   PackageSearch,
   TrendingUp,
-  TrendingDown,
-  Minus,
   ArrowRight,
   ShoppingCart,
   FileText,
   Activity,
 } from "lucide-react";
-import { Button, StatCard, Card, Badge, EmptyState, LoadingSpinner, PageHero } from "../components/ui";
+import { StatCard, Card, Badge, EmptyState, LoadingSpinner, PageHero } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
@@ -246,52 +244,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Right Sidebar */}
-        <div className="flex flex-col gap-5">
-          {/* Shortcuts */}
-          <Card
-            title="Shortcuts"
-            icon={Zap}
-            padding="none"
-          >
-            <div className="flex flex-col gap-2 p-4">
-              <Button
-                variant="primary"
-                icon={PlusCircle}
-                size="lg"
-                fullWidth
-                onClick={() => navigate("/orders/new")}
-              >
-                New Order
-              </Button>
-              <Button
-                variant="secondary"
-                icon={Factory}
-                size="lg"
-                fullWidth
-                onClick={() => navigate("/production")}
-              >
-                Production
-              </Button>
-              <Button
-                variant="secondary"
-                icon={Boxes}
-                size="lg"
-                fullWidth
-                onClick={() => navigate("/inventory")}
-              >
-                Inventory
-              </Button>
-              <Button
-                variant="secondary"
-                icon={BarChart3}
-                size="lg"
-                fullWidth
-                onClick={() => navigate("/reports")}
-              >
-                Reports
-              </Button>
-            </div>
-          </Card>
+        <div className="flex flex-col gap-5 h-full">
 
           {/* Inventory Alerts */}
           <Card
@@ -299,6 +252,7 @@ export default function Dashboard() {
             subtitle={hasAlerts ? `${lowStockProducts.length + lowStockMaterials.length} items low` : undefined}
             icon={AlertTriangle}
             padding="none"
+            className="flex-1 flex flex-col"
           >
             <div className="p-4">
               {!hasAlerts ? (

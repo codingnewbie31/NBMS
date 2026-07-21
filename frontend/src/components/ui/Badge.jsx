@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "./cn";
 
 // Status-driven color mapping, reused by tables, cards and headers
@@ -24,7 +23,7 @@ const SIZES = {
   md: "px-2.5 py-1 text-xs",
 };
 
-export default function Badge({
+function Badge({
   children,
   variant = "neutral",
   size = "sm",
@@ -50,3 +49,5 @@ export default function Badge({
     </span>
   );
 }
+export default Badge;
+export {Badge};
