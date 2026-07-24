@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { Button, Card, PageHero } from "../components/ui";
+import { Button, Card, PageHero, Badge } from "../components/ui";
 
 export default function ReportsPage() {
   const { user } = useAuth();

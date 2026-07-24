@@ -1,6 +1,7 @@
 // src/pages/OrdersPage.jsx
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   Plus,
   Eye,
@@ -29,6 +30,7 @@ import {
 export default function OrdersPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Data state
   const [orders, setOrders] = useState([]);
@@ -128,7 +130,7 @@ export default function OrdersPage() {
   const totalPages = Math.ceil(sortedOrders.length / itemsPerPage);
   const paginatedOrders = sortedOrders.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   // Reset to first page when filters change
@@ -136,9 +138,23 @@ export default function OrdersPage() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
+  // Show alert on successfull order making  
+  useEffect(() => {
+    if (location.state?.createdOrderNumber) {
+      toast.success(
+        `Order ${location.state.createdOrderNumber} created successfully!`,
+      );
+
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
+
   // Stats calculations
   const stats = useMemo(() => {
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+    const totalRevenue = orders.reduce(
+      (sum, o) => sum + (o.grandTotal || 0),
+      0,
+    );
     const paidOrders = orders.filter((o) => o.outstandingBalance === 0).length;
     const pendingOrders = orders.filter((o) => o.outstandingBalance > 0).length;
     return { totalRevenue, paidOrders, pendingOrders };
@@ -275,9 +291,16 @@ export default function OrdersPage() {
         subtitle="Manage and track customer orders"
         stats={[
           { label: "Total Orders", value: orders.length },
-          { label: "Revenue", value: `Rs. ${stats.totalRevenue.toLocaleString()}` },
+          {
+            label: "Revenue",
+            value: `Rs. ${stats.totalRevenue.toLocaleString()}`,
+          },
           { label: "Paid", value: stats.paidOrders },
-          { label: "Pending", value: stats.pendingOrders, highlight: stats.pendingOrders > 0 },
+          {
+            label: "Pending",
+            value: stats.pendingOrders,
+            highlight: stats.pendingOrders > 0,
+          },
         ]}
         actions={
           <Button
@@ -364,29 +387,34 @@ export default function OrdersPage() {
         }}
         emptyState={{
           icon: PackageSearch,
-          title: searchTerm || statusFilter !== "all" ? "No matching orders found" : "No orders yet",
-          description: searchTerm || statusFilter !== "all"
-            ? "Try adjusting your search terms or filters."
-            : "Create your first order to get started.",
-          action: searchTerm || statusFilter !== "all" ? (
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setSearchTerm("");
-                setStatusFilter("all");
-              }}
-            >
-              Clear Filters
-            </Button>
-          ) : (
-            <Button
-              variant="primary"
-              icon={Plus}
-              onClick={() => navigate("/orders/new")}
-            >
-              Create Order
-            </Button>
-          ),
+          title:
+            searchTerm || statusFilter !== "all"
+              ? "No matching orders found"
+              : "No orders yet",
+          description:
+            searchTerm || statusFilter !== "all"
+              ? "Try adjusting your search terms or filters."
+              : "Create your first order to get started.",
+          action:
+            searchTerm || statusFilter !== "all" ? (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("all");
+                }}
+              >
+                Clear Filters
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                icon={Plus}
+                onClick={() => navigate("/orders/new")}
+              >
+                Create Order
+              </Button>
+            ),
         }}
       />
 

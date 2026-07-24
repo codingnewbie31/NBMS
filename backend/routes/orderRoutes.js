@@ -3,26 +3,36 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Customer = require("../models/Customer");
 const authMiddleware = require("../middleware/authMiddleware");
+const Counter = require("../models/Counter");
 
 const router = express.Router();
 
+// Atomically increments and returns the next order number.
+// findOneAndUpdate with $inc is a single atomic Mongo operation, so two
+// requests arriving at the same time can never receive the same number.
 const generateOrderNumber = async () => {
-  const lastOrder = await Order.findOne().sort({ createdAt: -1 });
-  if (!lastOrder) return "ORD-001";
-  const lastNumber = parseInt(lastOrder.orderNumber.split("-")[1]);
-  const nextNumber = lastNumber + 1;
-  return `ORD-${String(nextNumber).padStart(3, "0")}`;
+  const counter = await Counter.findOneAndUpdate(
+    { name: "orderNumber" },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true },
+  );
+  return `ORD-${String(counter.seq).padStart(3, "0")}`;
+};
+
+// Read-only peek at what the next order number would be, without
+// consuming it — used only to display a preview in the UI.
+const peekNextOrderNumber = async () => {
+  const counter = await Counter.findOne({ name: "orderNumber" });
+  const nextSeq = (counter?.seq || 0) + 1;
+  return `ORD-${String(nextSeq).padStart(3, "0")}`;
 };
 
 router.post("/", authMiddleware, async (req, res) => {
   try {
-    const {
-      customerId,
-      items,
-      amountPaid,
-      orderNumber: sentOrderNumber,
-    } = req.body;
-    const orderNumber = sentOrderNumber || (await generateOrderNumber());
+    const { customerId, items, amountPaid } = req.body;
+    // Always generate atomically server-side — never trust a client-supplied
+    // order number, since it may just be a stale "preview" value.
+    const orderNumber = await generateOrderNumber();
 
     let grandTotal = 0;
     const processedItems = [];
@@ -104,7 +114,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 // next number
 router.get("/next-number", authMiddleware, async (req, res) => {
   try {
-    const nextNumber = await generateOrderNumber();
+    const nextNumber = await peekNextOrderNumber();
     res.json({ orderNumber: nextNumber });
   } catch (err) {
     res.status(500).json({ error: err.message });

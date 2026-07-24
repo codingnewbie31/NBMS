@@ -81,7 +81,7 @@ export default function NewOrderPage() {
 
   const grandTotal = items.reduce(
     (sum, item) => sum + calculateSubtotal(item),
-    0
+    0,
   );
   const outstandingBalance = grandTotal - Number(amountPaid);
 
@@ -90,8 +90,7 @@ export default function NewOrderPage() {
     setError("");
     setSubmitting(true);
     try {
-      await api.post("/orders", {
-        orderNumber,
+      const res = await api.post("/orders", {
         customerId: selectedCustomer._id,
         items: items.map((item) => ({
           productId: item.productId,
@@ -99,7 +98,10 @@ export default function NewOrderPage() {
         })),
         amountPaid: Number(amountPaid),
       });
-      navigate("/orders");
+
+      console.log(res.data);
+
+      navigate("/orders", { state: { createdOrderNumber: res.data.orderNumber } });
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong");
     } finally {
@@ -164,7 +166,9 @@ export default function NewOrderPage() {
             <div className="flex-1">
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Order Number
-                <span className="ml-1 font-normal text-slate-400">(auto-suggested)</span>
+                <span className="ml-1 font-normal text-slate-400">
+                  (auto-suggested)
+                </span>
               </label>
               <input
                 value={orderNumber}
@@ -201,7 +205,10 @@ export default function NewOrderPage() {
                     placeholder="Customer Name"
                     value={newCustomer.customerName}
                     onChange={(e) =>
-                      setNewCustomer({ ...newCustomer, customerName: e.target.value })
+                      setNewCustomer({
+                        ...newCustomer,
+                        customerName: e.target.value,
+                      })
                     }
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
@@ -209,7 +216,10 @@ export default function NewOrderPage() {
                     placeholder="Business Name"
                     value={newCustomer.businessName}
                     onChange={(e) =>
-                      setNewCustomer({ ...newCustomer, businessName: e.target.value })
+                      setNewCustomer({
+                        ...newCustomer,
+                        businessName: e.target.value,
+                      })
                     }
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
@@ -217,7 +227,10 @@ export default function NewOrderPage() {
                     placeholder="Phone Number"
                     value={newCustomer.phoneNumber}
                     onChange={(e) =>
-                      setNewCustomer({ ...newCustomer, phoneNumber: e.target.value })
+                      setNewCustomer({
+                        ...newCustomer,
+                        phoneNumber: e.target.value,
+                      })
                     }
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                   />
@@ -296,7 +309,8 @@ export default function NewOrderPage() {
             {selectedCustomer?.currentBalance > 0 && (
               <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
-                Outstanding balance: Rs. {selectedCustomer.currentBalance.toLocaleString()}
+                Outstanding balance: Rs.{" "}
+                {selectedCustomer.currentBalance.toLocaleString()}
               </div>
             )}
           </div>
@@ -362,8 +376,12 @@ export default function NewOrderPage() {
                       Rs. {subtotal.toFixed(0)}
                       {product && item.qtyBottles && (
                         <span className="block text-xs font-normal text-slate-400">
-                          {Math.floor(Number(item.qtyBottles) / product.caseCapacity)} cases +{" "}
-                          {Number(item.qtyBottles) % product.caseCapacity} bottles
+                          {Math.floor(
+                            Number(item.qtyBottles) / product.caseCapacity,
+                          )}{" "}
+                          cases +{" "}
+                          {Number(item.qtyBottles) % product.caseCapacity}{" "}
+                          bottles
                         </span>
                       )}
                     </div>
@@ -397,7 +415,9 @@ export default function NewOrderPage() {
         <Card title="Payment" icon={DollarSign}>
           <div className="space-y-4">
             <div className="flex items-center justify-between rounded-lg bg-slate-50 p-4">
-              <span className="text-sm font-medium text-slate-500">Grand Total</span>
+              <span className="text-sm font-medium text-slate-500">
+                Grand Total
+              </span>
               <span className="text-xl font-bold text-slate-900">
                 Rs. {grandTotal.toFixed(0)}
               </span>
